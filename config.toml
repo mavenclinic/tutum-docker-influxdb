@@ -9,8 +9,8 @@ bind-address = "0.0.0.0"
 
 [logging]
 # logging level can be one of "debug", "info", "warn" or "error"
-level  = "info"
-file   = "/opt/influxdb/shared/log.txt"         # stdout to log to standard out
+level  = "warn"
+file   = "stdout"         # stdout to log to standard out
 
 # Configure the admin server
 [admin]
@@ -38,9 +38,9 @@ read-timeout = "5s"
   # udp_enabled = true # enable udp interface on the same port as the tcp interface
 
   [input_plugins.udp]
-  enabled = false
-  # port = 4444
-  # database = ""
+  enabled = true
+  port = 4444
+  database = "${UDP_DATABASE}"
 
 # Raft configuration
 [raft]
@@ -60,6 +60,7 @@ dir = "/data/db"
 # will still be logged and once the local storage has caught up (or compacted) the writes
 # will be replayed from the WAL
 write-buffer-size = 10000
+default-engine = "rocksdb"
 
 [cluster]
 # A comma separated list of servers to seed
@@ -99,11 +100,11 @@ max-response-buffer-size = 100
 # that you don't need to buffer in memory, but you won't get the best performance.
 concurrent-shard-query-limit = 10
 
-[leveldb]
+[storage.engines.leveldb]
 
 # Maximum mmap open files, this will affect the virtual memory used by
 # the process
-max-open-files = 40
+max-open-files = 4086
 
 # LRU cache size, LRU is used by leveldb to store contents of the
 # uncompressed sstables. You can use `m` or `g` prefix for megabytes
@@ -121,6 +122,10 @@ point-batch-size = 100
 # The number of points to batch in memory before writing them to leveldb. Lowering this number will
 # reduce the memory usage, but will result in slower writes.
 write-batch-size = 5000000
+
+[storage.engines.rocksdb]
+max-open-files = 2046
+lru-cache-size = "128m"
 
 # These options specify how data is sharded across the cluster. There are two
 # shard configurations that have the same knobs: short term and long term.

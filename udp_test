@@ -1,0 +1,8 @@
+#!/usr/bin/python
+####
+print "========================="
+print "testing udp using sockets"
+print "========================="
+import socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+print sock.sendto('[{"name":"udp_test", "columns": ["value"], "points":[[69]]}]', ('127.0.0.1', 5454))

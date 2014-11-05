@@ -2,9 +2,15 @@
 
 set -m
 CONFIG_FILE="/config/config.toml"
+CONFIG_TEMPLATE="${CONFIG_FILE}.tpl"
+
+# template out the UDP_DATABASE based on our current environment
+echo "adding $UDP_DATABASE to configuration"
+perl -p -i -e 's;(\\*)(\$([a-zA-Z_][a-zA-Z_0-9]*)|\$\{([a-zA-Z_][a-zA-Z_0-9]*)\})?;substr($1,0,int(length($1)/2)).($2&&length($1)%2?$2:$ENV{$3||$4});eg' < $CONFIG_TEMPLATE > $CONFIG_FILE
 
 #Dynamically change the value of 'max-open-shards' to what 'ulimit -n' returns
 sed -i "s/^max-open-shards.*/max-open-shards = $(ulimit -n)/" ${CONFIG_FILE}
+
 
 #Configure InfluxDB Cluster
 if [ -n "${FORCE_HOSTNAME}" ]; then
